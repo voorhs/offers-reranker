@@ -6,12 +6,18 @@ This directory contains GitHub Actions workflows for automated testing and valid
 
 ### Reusable Workflow
 
-- **`reusable-ci.yaml`**: A reusable workflow that provides common CI functionality for all subprojects. It includes:
-  - Python environment setup
-  - Dependency installation via uv
-  - Ruff linting and formatting checks
-  - MyPy type checking
-  - Pytest testing
+- **`reusable-ci.yaml`**: A reusable workflow that provides common CI functionality for all subprojects. It includes three independent jobs that run in parallel:
+  - **Ruff job**: Linting and formatting checks
+  - **MyPy job**: Type checking
+  - **Pytest job**: Testing
+  
+  Each job runs independently, so if one fails, the others will still complete. This ensures comprehensive feedback even when some checks fail.
+  
+  **Optimizations:**
+  - Uses `cache-dependency-glob` to cache dependencies based on `uv.lock`
+  - Uses `--frozen` flag to skip dependency resolution
+  - Uses `--no-install-project` to only install dependencies (faster)
+  - Consistent `UV_CACHE_DIR` across jobs for better cache sharing
 
 ### Subproject Workflows
 

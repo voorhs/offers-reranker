@@ -29,7 +29,8 @@ on:
         description: 'Whether to run ruff linting'
 
 jobs:
-  ci:
+  ruff:
+    if: ${{ inputs.run-ruff }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -51,23 +52,82 @@ jobs:
         with:
           version: "0.8.8"
           enable-cache: true
+          cache-dependency-glob: "${{ inputs.working-directory }}/uv.lock"
 
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --frozen --no-install-project
+        env:
+          UV_CACHE_DIR: /tmp/uv-cache
 
       - name: Run ruff linting
-        if: ${{ inputs.run-ruff }}
         run: uv run ruff check .
 
       - name: Run ruff formatting check
-        if: ${{ inputs.run-ruff }}
         run: uv run ruff format --check .
 
+  mypy:
+    if: ${{ inputs.run-mypy }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.8"
+          enable-cache: true
+          cache-dependency-glob: "${{ inputs.working-directory }}/uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --frozen --no-install-project
+        env:
+          UV_CACHE_DIR: /tmp/uv-cache
+
       - name: Run mypy
-        if: ${{ inputs.run-mypy }}
         run: uv run mypy .
 
+  pytest:
+    if: ${{ inputs.run-tests }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.8"
+          enable-cache: true
+          cache-dependency-glob: "${{ inputs.working-directory }}/uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --frozen --no-install-project
+        env:
+          UV_CACHE_DIR: /tmp/uv-cache
+
       - name: Run tests
-        if: ${{ inputs.run-tests }}
         run: uv run pytest -v
 
