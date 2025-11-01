@@ -1,6 +1,6 @@
 """Example client for testing the reranker service."""
 
-import msgpack
+import msgpack  # type: ignore[import-untyped]
 import requests
 
 # Example request data

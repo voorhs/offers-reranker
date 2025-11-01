@@ -2,9 +2,9 @@
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
-from datasets import Dataset
+from datasets import Dataset  # type: ignore[import-untyped]
 
 
 def load_offers_data(data_path: Path) -> list[dict[str, Any]]:
@@ -25,7 +25,7 @@ def load_offers_data(data_path: Path) -> list[dict[str, Any]]:
     """
     with open(data_path, "r", encoding="utf-8") as f:
         data = json.load(f)
-    return data
+    return cast(list[dict[str, Any]], data)
 
 
 def normalize_score(score: float, min_score: float = 0.0, max_score: float = 100.0) -> float:

@@ -7,7 +7,7 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import cyclopts
 from dotenv import load_dotenv
@@ -22,7 +22,7 @@ app = cyclopts.App(
 )
 
 
-def parse_sample(line: str) -> dict:
+def parse_sample(line: str) -> dict[str, Any]:
     """Parse a single JSONL line into structured format.
 
     Args:
@@ -94,8 +94,8 @@ async def load(
     # Open JSONL file for writing incrementally
     with output_path.open("w", encoding="utf-8") as output_file:
         async with AsyncLogfireQueryClient(
-            read_token=os.getenv("LOGFIRE_READ_TOKEN"),
-            timeout=timeout,
+            read_token=os.getenv("LOGFIRE_READ_TOKEN") or "fake",
+            timeout=timeout,  # type: ignore[arg-type]
         ) as client:
             while True:
                 logger.info(f"Fetching batch at offset {offset}...")

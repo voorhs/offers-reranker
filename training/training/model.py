@@ -21,7 +21,7 @@ def create_cross_encoder(config: ModelConfig) -> CrossEncoder:
         max_length=config.max_length,
     )
 
-    return model
+    return model  # type: ignore[no-any-return]
 
 
 def setup_loss_function(model: CrossEncoder) -> BinaryCrossEntropyLoss:

@@ -69,7 +69,7 @@ def load_cross_encoder() -> CrossEncoder:
         )
 
         logger.info(f"Successfully loaded model on device: {model.device}")
-        return model
+        return model  # type: ignore[no-any-return]
 
     except Exception as e:
         logger.error(f"Failed to load model from {validated_path}: {e}")

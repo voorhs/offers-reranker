@@ -18,7 +18,7 @@ class RerankerWorker(TypedMsgPackMixin, Worker):
 
     def __init__(self) -> None:
         """Initialize the worker and load the model."""
-        super().__init__()
+        super().__init__()  # type: ignore[no-untyped-call]
         logger.info("Initializing RerankerWorker")
         self.model: CrossEncoder = load_cross_encoder()
         self.config = reranker_config

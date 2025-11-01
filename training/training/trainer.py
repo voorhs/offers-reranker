@@ -8,7 +8,7 @@ import torch
 from loguru import logger
 from sentence_transformers import CrossEncoder
 from sentence_transformers.cross_encoder import CrossEncoderTrainer, CrossEncoderTrainingArguments
-
+from datasets import Dataset  # type: ignore[import-untyped]
 from training.config import Config
 from training.data import create_dataset, load_offers_data, prepare_evaluation_data
 from training.evaluation import CrossEncoderRankingEvaluator
@@ -43,7 +43,7 @@ class OffersRerankerTrainer:
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(seed)
 
-    def prepare_data(self) -> tuple:
+    def prepare_data(self) -> tuple[Dataset, Dataset, CrossEncoderRankingEvaluator]:
         """Load and prepare training and evaluation datasets.
 
         Returns:
@@ -74,7 +74,9 @@ class OffersRerankerTrainer:
 
         return train_dataset, dev_dataset, evaluator
 
-    def setup_training(self, train_dataset, dev_dataset, evaluator) -> None:
+    def setup_training(
+        self, train_dataset: Dataset, dev_dataset: Dataset, evaluator: CrossEncoderRankingEvaluator
+    ) -> None:
         """Setup model, loss, and trainer.
 
         Args:
@@ -133,7 +135,7 @@ class OffersRerankerTrainer:
         if self.config.training.save_strategy == "steps" and self.config.training.save_steps is not None:
             training_args_dict["save_steps"] = self.config.training.save_steps
 
-        training_args = CrossEncoderTrainingArguments(**training_args_dict)
+        training_args = CrossEncoderTrainingArguments(**training_args_dict)  # type: ignore[arg-type]
 
         logger.info("Creating trainer...")
         self.trainer = CrossEncoderTrainer(
@@ -177,7 +179,7 @@ class OffersRerankerTrainer:
         self.model.save(str(save_path))
         logger.info("Model saved successfully!")
 
-    def evaluate(self, test_data_path: Path | None = None) -> dict:
+    def evaluate(self, test_data_path: Path | None = None) -> dict[str, float]:
         """Evaluate the model on test data.
 
         Args:
