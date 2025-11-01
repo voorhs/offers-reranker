@@ -1,5 +1,7 @@
 """Evaluation metrics for ranking: NDCG and MRR."""
 
+from typing import Any
+
 import numpy as np
 from loguru import logger
 from sentence_transformers import CrossEncoder
@@ -16,13 +18,13 @@ def dcg_at_k(relevance_scores: list[float], k: int) -> float:
     Returns:
         DCG@k score
     """
-    relevance_scores = np.array(relevance_scores[:k])
-    if relevance_scores.size == 0:
+    scores_array = np.array(relevance_scores[:k])
+    if scores_array.size == 0:
         return 0.0
-    
+
     # DCG = sum(rel_i / log2(i + 2)) for i in range(k)
-    discounts = np.log2(np.arange(2, relevance_scores.size + 2))
-    return float(np.sum(relevance_scores / discounts))
+    discounts = np.log2(np.arange(2, scores_array.size + 2))
+    return float(np.sum(scores_array / discounts))
 
 
 def ndcg_at_k(relevance_scores: list[float], k: int) -> float:
@@ -36,14 +38,14 @@ def ndcg_at_k(relevance_scores: list[float], k: int) -> float:
         NDCG@k score (0-1)
     """
     dcg = dcg_at_k(relevance_scores, k)
-    
+
     # Ideal DCG: sort scores in descending order
     ideal_scores = sorted(relevance_scores, reverse=True)
     idcg = dcg_at_k(ideal_scores, k)
-    
+
     if idcg == 0.0:
         return 0.0
-    
+
     return dcg / idcg
 
 
@@ -74,7 +76,7 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
 
     def __init__(
         self,
-        eval_data: list[dict],
+        eval_data: list[dict[str, Any]],
         name: str = "eval",
         ndcg_at_k: list[int] | None = None,
         mrr_threshold: float = 50.0,
@@ -95,7 +97,7 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
         self.ndcg_at_k = ndcg_at_k or [1, 3, 5]
         self.mrr_threshold = mrr_threshold
 
-    def __call__(self, model: CrossEncoder, output_path: str = None, epoch: int = -1, steps: int = -1) -> float:
+    def __call__(self, model: CrossEncoder, output_path: str | None = None, epoch: int = -1, steps: int = -1) -> float:  # type: ignore[override]
         """Evaluate model and return primary metric.
 
         Args:
@@ -107,8 +109,8 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
         Returns:
             Primary metric value (NDCG@3)
         """
-        ndcg_scores = {k: [] for k in self.ndcg_at_k}
-        mrr_scores = []
+        ndcg_scores: dict[int, list[float]] = {k: [] for k in self.ndcg_at_k}
+        mrr_scores: list[float] = []
 
         for sample in self.eval_data:
             query = sample["query"]
@@ -139,7 +141,7 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
         metrics = {}
         for k in self.ndcg_at_k:
             metrics[f"{self.name}_ndcg@{k}"] = float(np.mean(ndcg_scores[k]))
-        
+
         metrics[f"{self.name}_mrr"] = float(np.mean(mrr_scores))
 
         # Log metrics
@@ -147,7 +149,7 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
             logger.info(f"\nEpoch {epoch}:")
         elif steps != -1:
             logger.info(f"\nStep {steps}:")
-        
+
         for metric_name, value in metrics.items():
             logger.info(f"  {metric_name}: {value:.4f}")
 
@@ -156,4 +158,3 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
 
         # Return primary metric (NDCG@3)
         return metrics[f"{self.name}_ndcg@3"]
-

@@ -20,5 +20,28 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.18.2,<1.19.0",
     "pytest>=8.4.2,<8.5.0",
+    "ruff>=0.14.3,<0.14.4",
+    "types-pyyaml>=6.0.12.20250915,<6.1.0.0",
 ]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_redundant_casts = true
+warn_unreachable = true
+
+plugins = ["pydantic.mypy"]
+exclude = ["tests"]
+
+mypy_path = "."
+explicit_package_bases = true
+
+[tool.pydantic.mypy]
+init_forbid_extra = true
+init_typed = true

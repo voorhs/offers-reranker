@@ -2,9 +2,9 @@
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
-from datasets import Dataset
+from datasets import Dataset  # type: ignore[import-untyped]
 
 
 def load_offers_data(data_path: Path) -> list[dict[str, Any]]:
@@ -25,7 +25,7 @@ def load_offers_data(data_path: Path) -> list[dict[str, Any]]:
     """
     with open(data_path, "r", encoding="utf-8") as f:
         data = json.load(f)
-    return data
+    return cast(list[dict[str, Any]], data)
 
 
 def normalize_score(score: float, min_score: float = 0.0, max_score: float = 100.0) -> float:
@@ -62,21 +62,23 @@ def prepare_cross_encoder_samples(data: list[dict[str, Any]]) -> list[dict[str, 
             ]
     """
     samples = []
-    
+
     for item in data:
         user_query = item["user_query"]
         offers = item["offers"]
-        
+
         for offer_text, score in offers:
             # Normalize score from 0-100 to 0-1
             normalized_score = normalize_score(score, min_score=0.0, max_score=100.0)
-            
-            samples.append({
-                "sentence1": user_query,
-                "sentence2": offer_text,
-                "label": normalized_score,
-            })
-    
+
+            samples.append(
+                {
+                    "sentence1": user_query,
+                    "sentence2": offer_text,
+                    "label": normalized_score,
+                }
+            )
+
     return samples
 
 
@@ -114,19 +116,20 @@ def prepare_evaluation_data(data: list[dict[str, Any]]) -> list[dict[str, Any]]:
             ]
     """
     eval_samples = []
-    
+
     for item in data:
         user_query = item["user_query"]
         offers = item["offers"]
-        
+
         texts = [offer_text for offer_text, _ in offers]
         scores = [float(score) for _, score in offers]
-        
-        eval_samples.append({
-            "query": user_query,
-            "texts": texts,
-            "scores": scores,
-        })
-    
-    return eval_samples
 
+        eval_samples.append(
+            {
+                "query": user_query,
+                "texts": texts,
+                "scores": scores,
+            }
+        )
+
+    return eval_samples

@@ -25,7 +25,7 @@ if __name__ == "__main__":
     reranker_runtime = Runtime(RerankerWorker, timeout=timeout_seconds)
 
     # Create and configure server
-    server = Server()
+    server = Server()  # type: ignore[no-untyped-call]
     server.register_runtime(
         {
             "/rerank": [reranker_runtime],
@@ -36,5 +36,4 @@ if __name__ == "__main__":
     logger.info("  POST /rerank - Rerank offers based on query")
 
     # Start the server
-    server.run()
-
+    server.run()  # type: ignore[no-untyped-call]

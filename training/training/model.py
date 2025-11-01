@@ -20,8 +20,8 @@ def create_cross_encoder(config: ModelConfig) -> CrossEncoder:
         num_labels=config.num_labels,
         max_length=config.max_length,
     )
-    
-    return model
+
+    return model  # type: ignore[no-any-return]
 
 
 def setup_loss_function(model: CrossEncoder) -> BinaryCrossEntropyLoss:
@@ -41,6 +41,5 @@ def setup_loss_function(model: CrossEncoder) -> BinaryCrossEntropyLoss:
     # BinaryCrossEntropyLoss expects labels in [0, 1] range
     # Our normalized scores are already in this range
     loss = BinaryCrossEntropyLoss(model=model)
-    
-    return loss
 
+    return loss

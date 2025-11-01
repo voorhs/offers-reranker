@@ -1,2 +1,1 @@
 """Offers reranker inference service."""
-

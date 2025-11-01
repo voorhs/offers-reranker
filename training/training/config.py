@@ -53,21 +53,23 @@ class TrainingConfig(BaseModel):
     # Evaluation params
     eval_strategy: Literal["no", "steps", "epoch"] = Field("steps", description="Evaluation strategy")
     eval_steps: Optional[int] = Field(500, description="Evaluation steps", gt=0)
-    
+
     # Saving params
     save_strategy: Literal["no", "steps", "epoch"] = Field("steps", description="Save strategy")
     save_steps: Optional[int] = Field(500, description="Save steps", gt=0)
     save_total_limit: Optional[int] = Field(2, description="Maximum number of checkpoints to keep", ge=1)
     load_best_model_at_end: bool = Field(True, description="Load best model at end of training")
-    metric_for_best_model: str = Field("eval_evaluator", description="Metric to use for best model selection (eval_evaluator returns NDCG@3)")
+    metric_for_best_model: str = Field(
+        "eval_evaluator", description="Metric to use for best model selection (eval_evaluator returns NDCG@3)"
+    )
 
     # Output and logging
     output_dir: Path = Field(..., description="Output directory for model and checkpoints")
     logging_steps: int = Field(100, description="Logging steps", gt=0)
-    
+
     # Reproducibility
     seed: int = Field(42, description="Random seed", ge=0)
-    
+
     # Performance
     fp16: bool = Field(False, description="Use FP16 mixed precision training")
     bf16: bool = Field(False, description="Use BF16 mixed precision training")
@@ -103,31 +105,31 @@ def load_config(config_path: Path | str) -> Config:
         ValueError: If config validation fails
     """
     config_path = Path(config_path)
-    
+
     if not config_path.exists():
         raise FileNotFoundError(f"Configuration file not found: {config_path}")
-    
+
     with open(config_path, "r", encoding="utf-8") as f:
         config_dict = yaml.safe_load(f)
-    
+
     # Resolve paths relative to config file location or current working directory
     config_dir = config_path.parent.resolve()
     cwd = Path.cwd()
-    
+
     def resolve_path(path_str: str, check_existence: bool = True) -> Path:
         """Resolve a path relative to config directory or CWD.
-        
+
         If check_existence is True, prefers the path that exists.
         Otherwise tries config directory first, then CWD.
         """
         path = Path(path_str)
         if path.is_absolute():
             return path
-        
+
         # Try both locations
         resolved_from_config = (config_dir / path).resolve()
         resolved_from_cwd = (cwd / path).resolve()
-        
+
         if check_existence:
             # Prefer the path that exists
             if resolved_from_cwd.exists():
@@ -140,16 +142,15 @@ def load_config(config_path: Path | str) -> Config:
         else:
             # For output dirs that don't exist yet, prefer config-relative
             return resolved_from_config
-    
+
     if "data" in config_dict:
         for path_key in ["train_path", "dev_path", "test_path"]:
             if path_key in config_dict["data"] and config_dict["data"][path_key]:
                 resolved = resolve_path(config_dict["data"][path_key], check_existence=True)
                 config_dict["data"][path_key] = str(resolved)
-    
+
     if "training" in config_dict and "output_dir" in config_dict["training"]:
         resolved = resolve_path(config_dict["training"]["output_dir"], check_existence=False)
         config_dict["training"]["output_dir"] = str(resolved)
-    
-    return Config(**config_dict)
 
+    return Config(**config_dict)
