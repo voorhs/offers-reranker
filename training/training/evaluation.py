@@ -19,7 +19,7 @@ def dcg_at_k(relevance_scores: list[float], k: int) -> float:
     relevance_scores = np.array(relevance_scores[:k])
     if relevance_scores.size == 0:
         return 0.0
-    
+
     # DCG = sum(rel_i / log2(i + 2)) for i in range(k)
     discounts = np.log2(np.arange(2, relevance_scores.size + 2))
     return float(np.sum(relevance_scores / discounts))
@@ -36,14 +36,14 @@ def ndcg_at_k(relevance_scores: list[float], k: int) -> float:
         NDCG@k score (0-1)
     """
     dcg = dcg_at_k(relevance_scores, k)
-    
+
     # Ideal DCG: sort scores in descending order
     ideal_scores = sorted(relevance_scores, reverse=True)
     idcg = dcg_at_k(ideal_scores, k)
-    
+
     if idcg == 0.0:
         return 0.0
-    
+
     return dcg / idcg
 
 
@@ -139,7 +139,7 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
         metrics = {}
         for k in self.ndcg_at_k:
             metrics[f"{self.name}_ndcg@{k}"] = float(np.mean(ndcg_scores[k]))
-        
+
         metrics[f"{self.name}_mrr"] = float(np.mean(mrr_scores))
 
         # Log metrics
@@ -147,7 +147,7 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
             logger.info(f"\nEpoch {epoch}:")
         elif steps != -1:
             logger.info(f"\nStep {steps}:")
-        
+
         for metric_name, value in metrics.items():
             logger.info(f"  {metric_name}: {value:.4f}")
 
@@ -156,4 +156,3 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
 
         # Return primary metric (NDCG@3)
         return metrics[f"{self.name}_ndcg@3"]
-

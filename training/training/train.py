@@ -26,14 +26,14 @@ def main() -> None:
         action="store_true",
         help="Enable verbose output",
     )
-    
+
     args = parser.parse_args()
-    
+
     try:
         # Load configuration
         logger.info(f"Loading configuration from {args.config}...")
         config = load_config(args.config)
-        
+
         if args.verbose:
             logger.info("\nConfiguration:")
             logger.info(f"  Model: {config.model.model_name}")
@@ -44,18 +44,18 @@ def main() -> None:
             logger.info(f"  Batch size: {config.training.batch_size}")
             logger.info(f"  Learning rate: {config.training.learning_rate}")
             logger.info("")
-        
+
         # Initialize trainer
         trainer = OffersRerankerTrainer(config)
-        
+
         # Run training pipeline
         trainer.run()
-        
+
         logger.info("\n" + "=" * 80)
         logger.info("Training pipeline completed successfully!")
         logger.info(f"Model saved to: {config.training.output_dir}")
         logger.info("=" * 80)
-        
+
     except FileNotFoundError as e:
         logger.error(f"Error: {e}")
         sys.exit(1)
@@ -69,4 +69,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

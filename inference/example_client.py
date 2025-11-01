@@ -35,4 +35,3 @@ for offer in result["results"]:
     print(f"Rank {offer['rank']}: {offer['text']}")
     print(f"  Score: {offer['score']:.4f}")
     print()
-

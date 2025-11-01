@@ -39,11 +39,11 @@ def test_load_offers_data():
             ],
         },
     ]
-    
+
     with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         json.dump(data, f)
         temp_path = Path(f.name)
-    
+
     try:
         loaded_data = load_offers_data(temp_path)
         assert len(loaded_data) == 2
@@ -67,22 +67,22 @@ def test_prepare_cross_encoder_samples():
             ],
         },
     ]
-    
+
     samples = prepare_cross_encoder_samples(data)
-    
+
     # Should have 3 samples (one per offer)
     assert len(samples) == 3
-    
+
     # Check first sample
     assert samples[0]["sentence1"] == "test query"
     assert samples[0]["sentence2"] == "offer 1"
     assert samples[0]["label"] == 1.0  # 100 -> 1.0
-    
+
     # Check second sample
     assert samples[1]["sentence1"] == "test query"
     assert samples[1]["sentence2"] == "offer 2"
     assert samples[1]["label"] == 0.5  # 50 -> 0.5
-    
+
     # Check third sample
     assert samples[2]["sentence1"] == "test query"
     assert samples[2]["sentence2"] == "offer 3"
@@ -106,12 +106,12 @@ def test_prepare_cross_encoder_samples_multiple_queries():
             ],
         },
     ]
-    
+
     samples = prepare_cross_encoder_samples(data)
-    
+
     # Should have 3 total samples
     assert len(samples) == 3
-    
+
     # Check queries are preserved
     assert samples[0]["sentence1"] == "query 1"
     assert samples[1]["sentence1"] == "query 1"
@@ -135,17 +135,17 @@ def test_prepare_evaluation_data():
             ],
         },
     ]
-    
+
     eval_data = prepare_evaluation_data(data)
-    
+
     # Should have 2 evaluation samples (one per query)
     assert len(eval_data) == 2
-    
+
     # Check first sample
     assert eval_data[0]["query"] == "test query 1"
     assert eval_data[0]["texts"] == ["offer 1", "offer 2"]
     assert eval_data[0]["scores"] == [80.0, 60.0]
-    
+
     # Check second sample
     assert eval_data[1]["query"] == "test query 2"
     assert eval_data[1]["texts"] == ["offer 3"]
@@ -163,25 +163,24 @@ def test_create_dataset():
             ],
         },
     ]
-    
+
     with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         json.dump(data, f)
         temp_path = Path(f.name)
-    
+
     try:
         dataset = create_dataset(temp_path)
-        
+
         # Check dataset properties
         assert len(dataset) == 2
         assert "sentence1" in dataset.column_names
         assert "sentence2" in dataset.column_names
         assert "label" in dataset.column_names
-        
+
         # Check first sample
         assert dataset[0]["sentence1"] == "test query"
         assert dataset[0]["sentence2"] == "offer 1"
         assert dataset[0]["label"] == 0.8
-        
+
     finally:
         temp_path.unlink()
-
