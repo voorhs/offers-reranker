@@ -58,22 +58,10 @@ training:
 
 ### Training
 
-Run training with a config file:
-
-```bash
-uv run train-reranker configs/example.yaml
-```
-
-Or use the Python module directly:
+Use the Python module directly:
 
 ```bash
 uv run python -m training.train configs/example.yaml
-```
-
-With verbose output:
-
-```bash
-uv run train-reranker configs/example.yaml --verbose
 ```
 
 ### Running Tests

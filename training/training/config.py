@@ -110,19 +110,46 @@ def load_config(config_path: Path | str) -> Config:
     with open(config_path, "r", encoding="utf-8") as f:
         config_dict = yaml.safe_load(f)
     
-    # Resolve paths relative to config file location
-    config_dir = config_path.parent
+    # Resolve paths relative to config file location or current working directory
+    config_dir = config_path.parent.resolve()
+    cwd = Path.cwd()
+    
+    def resolve_path(path_str: str, check_existence: bool = True) -> Path:
+        """Resolve a path relative to config directory or CWD.
+        
+        If check_existence is True, prefers the path that exists.
+        Otherwise tries config directory first, then CWD.
+        """
+        path = Path(path_str)
+        if path.is_absolute():
+            return path
+        
+        # Try both locations
+        resolved_from_config = (config_dir / path).resolve()
+        resolved_from_cwd = (cwd / path).resolve()
+        
+        if check_existence:
+            # Prefer the path that exists
+            if resolved_from_cwd.exists():
+                return resolved_from_cwd
+            elif resolved_from_config.exists():
+                return resolved_from_config
+            # If neither exists, return CWD-relative (more common case)
+            # Validation will catch if it doesn't exist
+            return resolved_from_cwd
+        else:
+            # For output dirs that don't exist yet, prefer config-relative
+            return resolved_from_config
+    
     if "data" in config_dict:
         for path_key in ["train_path", "dev_path", "test_path"]:
             if path_key in config_dict["data"] and config_dict["data"][path_key]:
-                path = Path(config_dict["data"][path_key])
-                if not path.is_absolute():
-                    config_dict["data"][path_key] = str(config_dir / path)
+                resolved = resolve_path(config_dict["data"][path_key], check_existence=True)
+                config_dict["data"][path_key] = str(resolved)
     
     if "training" in config_dict and "output_dir" in config_dict["training"]:
-        output_path = Path(config_dict["training"]["output_dir"])
-        if not output_path.is_absolute():
-            config_dict["training"]["output_dir"] = str(config_dir / output_path)
+        resolved = resolve_path(config_dict["training"]["output_dir"], check_existence=False)
+        config_dict["training"]["output_dir"] = str(resolved)
     
     return Config(**config_dict)
 
