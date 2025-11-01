@@ -1,6 +1,7 @@
 """Evaluation metrics for ranking: NDCG and MRR."""
 
 import numpy as np
+from loguru import logger
 from sentence_transformers import CrossEncoder
 from sentence_transformers.evaluation import SentenceEvaluator
 
@@ -143,12 +144,12 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
 
         # Log metrics
         if epoch != -1:
-            print(f"\nEpoch {epoch}:")
+            logger.info(f"\nEpoch {epoch}:")
         elif steps != -1:
-            print(f"\nStep {steps}:")
+            logger.info(f"\nStep {steps}:")
         
         for metric_name, value in metrics.items():
-            print(f"  {metric_name}: {value:.4f}")
+            logger.info(f"  {metric_name}: {value:.4f}")
 
         # Store metrics for retrieval
         self.last_metrics = metrics

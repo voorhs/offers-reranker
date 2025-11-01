@@ -4,6 +4,8 @@ import argparse
 import sys
 from pathlib import Path
 
+from loguru import logger
+
 from training.config import load_config
 from training.trainer import OffersRerankerTrainer
 
@@ -29,19 +31,19 @@ def main() -> None:
     
     try:
         # Load configuration
-        print(f"Loading configuration from {args.config}...")
+        logger.info(f"Loading configuration from {args.config}...")
         config = load_config(args.config)
         
         if args.verbose:
-            print("\nConfiguration:")
-            print(f"  Model: {config.model.model_name}")
-            print(f"  Training data: {config.data.train_path}")
-            print(f"  Dev data: {config.data.dev_path}")
-            print(f"  Output dir: {config.training.output_dir}")
-            print(f"  Epochs: {config.training.num_epochs}")
-            print(f"  Batch size: {config.training.batch_size}")
-            print(f"  Learning rate: {config.training.learning_rate}")
-            print()
+            logger.info("\nConfiguration:")
+            logger.info(f"  Model: {config.model.model_name}")
+            logger.info(f"  Training data: {config.data.train_path}")
+            logger.info(f"  Dev data: {config.data.dev_path}")
+            logger.info(f"  Output dir: {config.training.output_dir}")
+            logger.info(f"  Epochs: {config.training.num_epochs}")
+            logger.info(f"  Batch size: {config.training.batch_size}")
+            logger.info(f"  Learning rate: {config.training.learning_rate}")
+            logger.info("")
         
         # Initialize trainer
         trainer = OffersRerankerTrainer(config)
@@ -49,21 +51,19 @@ def main() -> None:
         # Run training pipeline
         trainer.run()
         
-        print("\n" + "=" * 80)
-        print("Training pipeline completed successfully!")
-        print(f"Model saved to: {config.training.output_dir}")
-        print("=" * 80)
+        logger.info("\n" + "=" * 80)
+        logger.info("Training pipeline completed successfully!")
+        logger.info(f"Model saved to: {config.training.output_dir}")
+        logger.info("=" * 80)
         
     except FileNotFoundError as e:
-        print(f"Error: {e}", file=sys.stderr)
+        logger.error(f"Error: {e}")
         sys.exit(1)
     except ValueError as e:
-        print(f"Configuration error: {e}", file=sys.stderr)
+        logger.error(f"Configuration error: {e}")
         sys.exit(1)
     except Exception as e:
-        print(f"Unexpected error: {e}", file=sys.stderr)
-        import traceback
-        traceback.print_exc()
+        logger.exception(f"Unexpected error: {e}")
         sys.exit(1)
 
 

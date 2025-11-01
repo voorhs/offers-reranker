@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from loguru import logger
 from sentence_transformers import CrossEncoder
 from sentence_transformers.cross_encoder import CrossEncoderTrainer, CrossEncoderTrainingArguments
 
@@ -48,20 +49,20 @@ class OffersRerankerTrainer:
         Returns:
             Tuple of (train_dataset, dev_dataset, evaluator)
         """
-        print("Loading datasets...")
+        logger.info("Loading datasets...")
         
         # Load training data
         train_dataset = create_dataset(self.config.data.train_path)
-        print(f"Training samples: {len(train_dataset)}")
+        logger.info(f"Training samples: {len(train_dataset)}")
         
         # Load development data
         dev_dataset = create_dataset(self.config.data.dev_path)
-        print(f"Development samples (flattened): {len(dev_dataset)}")
+        logger.info(f"Development samples (flattened): {len(dev_dataset)}")
         
         # Prepare evaluation data (keeping queries grouped)
         dev_data_raw = load_offers_data(self.config.data.dev_path)
         eval_data = prepare_evaluation_data(dev_data_raw)
-        print(f"Development queries (for ranking): {len(eval_data)}")
+        logger.info(f"Development queries (for ranking): {len(eval_data)}")
         
         # Create evaluator
         evaluator = CrossEncoderRankingEvaluator(
@@ -81,13 +82,13 @@ class OffersRerankerTrainer:
             dev_dataset: Development dataset
             evaluator: Ranking evaluator
         """
-        print("\nInitializing model...")
+        logger.info("\nInitializing model...")
         self.model = create_cross_encoder(self.config.model)
         
-        print("Setting up loss function...")
+        logger.info("Setting up loss function...")
         loss_fn = setup_loss_function(self.model)
         
-        print("Configuring training arguments...")
+        logger.info("Configuring training arguments...")
         
         # Build training arguments dict to handle optional parameters
         training_args_dict = {
@@ -141,7 +142,7 @@ class OffersRerankerTrainer:
         
         training_args = CrossEncoderTrainingArguments(**training_args_dict)
         
-        print("Creating trainer...")
+        logger.info("Creating trainer...")
         self.trainer = CrossEncoderTrainer(
             model=self.model,
             args=training_args,
@@ -156,15 +157,15 @@ class OffersRerankerTrainer:
         if self.trainer is None:
             raise RuntimeError("Trainer not initialized. Call setup_training() first.")
         
-        print("\n" + "=" * 80)
-        print("Starting training...")
-        print("=" * 80 + "\n")
+        logger.info("\n" + "=" * 80)
+        logger.info("Starting training...")
+        logger.info("=" * 80 + "\n")
         
         self.trainer.train()
         
-        print("\n" + "=" * 80)
-        print("Training completed!")
-        print("=" * 80 + "\n")
+        logger.info("\n" + "=" * 80)
+        logger.info("Training completed!")
+        logger.info("=" * 80 + "\n")
 
     def save_model(self, output_path: Path | str | None = None) -> None:
         """Save the trained model.
@@ -179,9 +180,9 @@ class OffersRerankerTrainer:
         save_path = Path(save_path)
         save_path.mkdir(parents=True, exist_ok=True)
         
-        print(f"\nSaving model to {save_path}...")
+        logger.info(f"\nSaving model to {save_path}...")
         self.model.save(str(save_path))
-        print("Model saved successfully!")
+        logger.info("Model saved successfully!")
 
     def evaluate(self, test_data_path: Path | None = None) -> dict:
         """Evaluate the model on test data.
@@ -199,7 +200,7 @@ class OffersRerankerTrainer:
         if test_path is None:
             raise ValueError("No test data path provided.")
         
-        print(f"\nEvaluating on test data: {test_path}")
+        logger.info(f"\nEvaluating on test data: {test_path}")
         
         # Load test data
         test_data_raw = load_offers_data(test_path)
@@ -234,12 +235,12 @@ class OffersRerankerTrainer:
         
         # Evaluate on test set if available
         if self.config.data.test_path is not None:
-            print("\n" + "=" * 80)
-            print("Final evaluation on test set")
-            print("=" * 80)
+            logger.info("\n" + "=" * 80)
+            logger.info("Final evaluation on test set")
+            logger.info("=" * 80)
             test_metrics = self.evaluate()
             
-            print("\nTest set results:")
+            logger.info("\nTest set results:")
             for metric_name, value in test_metrics.items():
-                print(f"  {metric_name}: {value:.4f}")
+                logger.info(f"  {metric_name}: {value:.4f}")
 

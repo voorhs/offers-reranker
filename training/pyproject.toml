@@ -9,6 +9,7 @@ requires-python = ">=3.12"
 dependencies = [
     "accelerate>=1.11.0,<1.12.0",
     "datasets>=4.3.0,<4.4.0",
+    "loguru>=0.7.3,<0.7.4",
     "numpy>=2.3.4,<2.4.0",
     "pydantic>=2.12.3,<2.13.0",
     "pyyaml>=6.0.3,<6.1.0",
@@ -24,7 +25,3 @@ dev = [
 
 [project.scripts]
 train-reranker = "training.train:main"
-
-[build-system]
-requires = ["uv_build>=0.8.8,<0.9.0"]
-build-backend = "uv_build"
