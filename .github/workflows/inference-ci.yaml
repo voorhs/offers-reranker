@@ -1,0 +1,27 @@
+name: Inference CI
+
+on:
+  push:
+    branches: [ main, master, develop, feat/** ]
+    paths:
+      - 'inference/**'
+      - '.github/workflows/inference-ci.yaml'
+      - '.github/workflows/reusable-ci.yaml'
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - 'inference/**'
+      - '.github/workflows/inference-ci.yaml'
+      - '.github/workflows/reusable-ci.yaml'
+
+jobs:
+  inference-ci:
+    name: Inference CI
+    uses: ./.github/workflows/reusable-ci.yaml
+    with:
+      working-directory: ./inference
+      python-version: '3.12'
+      run-tests: true
+      run-mypy: true
+      run-ruff: true
+

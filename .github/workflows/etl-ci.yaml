@@ -1,0 +1,27 @@
+name: ETL CI
+
+on:
+  push:
+    branches: [ main, master, develop, feat/** ]
+    paths:
+      - 'etl/**'
+      - '.github/workflows/etl-ci.yaml'
+      - '.github/workflows/reusable-ci.yaml'
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - 'etl/**'
+      - '.github/workflows/etl-ci.yaml'
+      - '.github/workflows/reusable-ci.yaml'
+
+jobs:
+  etl-ci:
+    name: ETL CI
+    uses: ./.github/workflows/reusable-ci.yaml
+    with:
+      working-directory: ./etl
+      python-version: '3.12'
+      run-tests: false
+      run-mypy: true
+      run-ruff: true
+

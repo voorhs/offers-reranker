@@ -1,0 +1,73 @@
+name: Reusable CI
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        required: true
+        type: string
+        description: 'Working directory for the subproject'
+      python-version:
+        required: false
+        type: string
+        default: '3.12'
+        description: 'Python version to use'
+      run-tests:
+        required: false
+        type: boolean
+        default: true
+        description: 'Whether to run tests'
+      run-mypy:
+        required: false
+        type: boolean
+        default: true
+        description: 'Whether to run mypy'
+      run-ruff:
+        required: false
+        type: boolean
+        default: true
+        description: 'Whether to run ruff linting'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.8"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run ruff linting
+        if: ${{ inputs.run-ruff }}
+        run: uv run ruff check .
+
+      - name: Run ruff formatting check
+        if: ${{ inputs.run-ruff }}
+        run: uv run ruff format --check .
+
+      - name: Run mypy
+        if: ${{ inputs.run-mypy }}
+        run: uv run mypy .
+
+      - name: Run tests
+        if: ${{ inputs.run-tests }}
+        run: uv run pytest -v
+
