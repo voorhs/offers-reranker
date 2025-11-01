@@ -1,12 +1,6 @@
 name: ETL CI
 
 on:
-  push:
-    branches: [ main, master, develop, feat/** ]
-    paths:
-      - 'etl/**'
-      - '.github/workflows/etl-ci.yaml'
-      - '.github/workflows/reusable-ci.yaml'
   pull_request:
     branches: [ main, master, develop ]
     paths:

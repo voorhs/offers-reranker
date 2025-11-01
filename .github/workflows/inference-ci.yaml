@@ -1,12 +1,6 @@
 name: Inference CI
 
 on:
-  push:
-    branches: [ main, master, develop, feat/** ]
-    paths:
-      - 'inference/**'
-      - '.github/workflows/inference-ci.yaml'
-      - '.github/workflows/reusable-ci.yaml'
   pull_request:
     branches: [ main, master, develop ]
     paths:

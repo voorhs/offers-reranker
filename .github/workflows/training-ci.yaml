@@ -1,12 +1,6 @@
 name: Training CI
 
 on:
-  push:
-    branches: [ main, master, develop, feat/** ]
-    paths:
-      - 'training/**'
-      - '.github/workflows/training-ci.yaml'
-      - '.github/workflows/reusable-ci.yaml'
   pull_request:
     branches: [ main, master, develop ]
     paths:
