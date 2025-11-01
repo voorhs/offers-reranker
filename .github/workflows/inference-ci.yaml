@@ -2,7 +2,6 @@ name: Inference CI
 
 on:
   pull_request:
-    branches: [ main, master, develop ]
     paths:
       - 'inference/**'
       - '.github/workflows/inference-ci.yaml'
