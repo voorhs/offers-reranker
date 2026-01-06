@@ -30,7 +30,7 @@ def main() -> None:
     test_path = config.data.test_path
     if test_path is None:
         raise ValueError("test_path not specified in config")
-    
+
     logger.info(f"Evaluating on test data: {test_path}")
     test_data_raw = load_offers_data(test_path)
     eval_data = prepare_evaluation_data(test_data_raw)
