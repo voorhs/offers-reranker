@@ -3,7 +3,8 @@ name = "pipeline"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = "==3.12.*"
 dependencies = [
     "dvc[s3]>=3.65.0,<3.66.0",
+    "pathspec==0.12.1",
 ]
