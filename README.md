@@ -18,6 +18,41 @@
 4. Запустить пайплайн: `uv run dvc repro`
 5. Отгрузить результаты пайплайна: `uv run dvc push`
 
+## MLflow Tracking
+
+Проект использует MLflow для отслеживания экспериментов.
+
+### Локальный режим (по умолчанию)
+
+```bash
+cd training
+uv run mlflow ui
+```
+
+### Удалённый сервер
+
+Для подключения к удалённому MLflow серверу задайте переменные окружения:
+
+```bash
+# Tracking server
+export MLFLOW_TRACKING_URI="http://mlflow-server:5001"
+
+# Для S3/MinIO хранилища артефактов (если используется)
+export AWS_ACCESS_KEY_ID="your-access-key"
+export AWS_SECRET_ACCESS_KEY="your-secret-key"
+export MLFLOW_S3_ENDPOINT_URL="http://minio-server:9000"
+```
+
+> **Note:** Для локальной отладки доступен референсный `docker-compose.mlflow.yaml`.
+> Production-сервер должен быть настроен администраторами.
+
+### Что логируется
+
+| Этап | Параметры | Метрики | Артефакты |
+|------|-----------|---------|-----------|
+| train | model_name, lr, batch_size, num_epochs, ... | train_loss, eval_ndcg@k (autolog) | config.yaml, model/, dvc.lock |
+| evaluate | model_path, test_path | test_ndcg@1/3/5, test_mrr | metrics.json |
+
 ## Целевые метрики
 
 - NDCG@3 > 0.6
