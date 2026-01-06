@@ -1,11 +1,6 @@
 stages:
   prepare:
-    cmd: >
-      cd etl && uv run python -m main
-      --skip-load
-      --raw-output ../data/samples.jsonl
-      --parsed-output ../data/parsed_samples.json
-      --split-dir ../data/splits
+    cmd: cd etl && uv run python -m main --skip-load --raw-output ../data/samples.jsonl --parsed-output ../data/parsed_samples.json --split-dir ../data/splits
     deps:
       - etl/main.py
       - data/samples.jsonl
@@ -31,9 +26,9 @@ stages:
           persist: true
 
   evaluate:
-    cmd: cd training && uv run python scripts/evaluate.py --config configs/pipeline.yaml --output ../metrics.json
+    cmd: cd training && uv run python -m training.evaluate --config configs/pipeline.yaml --output ../metrics.json
     deps:
-      - training/scripts/evaluate.py
+      - training/training/evaluate.py
       - training/training/trainer.py
       - training/training/evaluation.py
       - training/configs/pipeline.yaml
