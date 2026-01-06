@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+import mlflow
 from loguru import logger
 from sentence_transformers import CrossEncoder
 
@@ -16,10 +17,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate trained model")
     parser.add_argument("--config", type=Path, required=True, help="Path to config file")
     parser.add_argument("--output", type=Path, required=True, help="Path to output metrics JSON")
+    parser.add_argument(
+        "--experiment-name",
+        type=str,
+        default="offers-reranker",
+        help="MLflow experiment name",
+    )
     args = parser.parse_args()
 
     # Load config
     config = load_config(args.config)
+
+    # Setup MLflow
+    mlflow.set_experiment(args.experiment_name)
 
     # Load model from output_dir
     model_path = config.training.output_dir
@@ -43,18 +53,44 @@ def main() -> None:
         mrr_threshold=50.0,
     )
 
-    # Run evaluation
-    evaluator(model)
-    metrics = evaluator.last_metrics
+    # Run evaluation and log to MLflow
+    with mlflow.start_run(run_name=f"evaluate-{config.model.model_name}"):
+        # Log parameters
+        mlflow.log_params(
+            {
+                "model_path": str(model_path),
+                "test_path": str(test_path),
+                "model_name": config.model.model_name,
+            }
+        )
 
-    # Save metrics
-    logger.info(f"Saving metrics to {args.output}")
-    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    with open(args.output, "w") as f:
-        json.dump(metrics, f, indent=2)
+        # Set tags
+        mlflow.set_tags(
+            {
+                "model_type": "cross-encoder",
+                "task": "evaluation",
+            }
+        )
 
-    logger.info("Evaluation complete!")
-    logger.info(f"Metrics: {metrics}")
+        # Run evaluation
+        evaluator(model)
+        metrics = evaluator.last_metrics
+
+        # Log test metrics to MLflow
+        mlflow.log_metrics(metrics)
+
+        # Save metrics to file
+        logger.info(f"Saving metrics to {args.output}")
+        Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+        with open(args.output, "w") as f:
+            json.dump(metrics, f, indent=2)
+
+        # Log metrics.json as artifact
+        mlflow.log_artifact(str(args.output), artifact_path="metrics")
+
+        logger.info("Evaluation complete!")
+        logger.info(f"Metrics: {metrics}")
+        logger.info(f"MLflow run ID: {mlflow.active_run().info.run_id}")
 
 
 if __name__ == "__main__":
