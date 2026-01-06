@@ -18,6 +18,26 @@
 4. Запустить пайплайн: `uv run dvc repro`
 5. Отгрузить результаты пайплайна: `uv run dvc push`
 
+## MLflow Tracking
+
+Проект использует MLflow для отслеживания экспериментов.
+
+### Просмотр результатов
+
+```bash
+cd training
+uv run mlflow ui
+```
+
+Откройте http://localhost:5000 в браузере.
+
+### Что логируется
+
+| Этап | Параметры | Метрики | Артефакты |
+|------|-----------|---------|-----------|
+| train | model_name, lr, batch_size, num_epochs, ... | train_loss, eval_ndcg@k (autolog) | config.yaml, model/, dvc.lock |
+| evaluate | model_path, test_path | test_ndcg@1/3/5, test_mrr | metrics.json |
+
 ## Целевые метрики
 
 - NDCG@3 > 0.6
