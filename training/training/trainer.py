@@ -179,42 +179,7 @@ class OffersRerankerTrainer:
         self.model.save(str(save_path))
         logger.info("Model saved successfully!")
 
-    def evaluate(self, test_data_path: Path | None = None) -> dict[str, float]:
-        """Evaluate the model on test data.
-
-        Args:
-            test_data_path: Path to test data (defaults to config test_path)
-
-        Returns:
-            Dictionary of evaluation metrics
-        """
-        if self.model is None:
-            raise RuntimeError("Model not initialized.")
-
-        test_path = test_data_path or self.config.data.test_path
-        if test_path is None:
-            raise ValueError("No test data path provided.")
-
-        logger.info(f"\nEvaluating on test data: {test_path}")
-
-        # Load test data
-        test_data_raw = load_offers_data(test_path)
-        eval_data = prepare_evaluation_data(test_data_raw)
-
-        # Create evaluator
-        evaluator = CrossEncoderRankingEvaluator(
-            eval_data=eval_data,
-            name="test",
-            ndcg_at_k=[1, 3, 5],
-            mrr_threshold=50.0,
-        )
-
-        # Run evaluation
-        evaluator(self.model)
-
-        return evaluator.last_metrics
-
-    def train(self) -> None:
+    def run(self) -> None:
         """Run the complete training pipeline."""
         # Prepare data
         train_dataset, dev_dataset, evaluator = self._prepare_data()

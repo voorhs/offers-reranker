@@ -1,0 +1,44 @@
+stages:
+  prepare:
+    cmd: >
+      cd etl && uv run python -m main
+      --skip-load
+      --raw-output ../data/samples.jsonl
+      --parsed-output ../data/parsed_samples.json
+      --split-dir ../data/splits
+    deps:
+      - etl/main.py
+      - data/samples.jsonl
+    outs:
+      - data/parsed_samples.json
+      - data/splits/train.json
+      - data/splits/dev.json
+      - data/splits/test.json
+
+  train:
+    cmd: cd training && uv run python -m training.train configs/pipeline.yaml
+    deps:
+      - training/training/trainer.py
+      - training/training/train.py
+      - training/training/config.py
+      - training/training/data.py
+      - training/training/model.py
+      - training/configs/pipeline.yaml
+      - data/splits/train.json
+      - data/splits/dev.json
+    outs:
+      - models/rubert-tiny-reranker:
+          persist: true
+
+  evaluate:
+    cmd: cd training && uv run python scripts/evaluate.py --config configs/pipeline.yaml --output ../metrics.json
+    deps:
+      - training/scripts/evaluate.py
+      - training/training/trainer.py
+      - training/training/evaluation.py
+      - training/configs/pipeline.yaml
+      - models/rubert-tiny-reranker
+      - data/splits/test.json
+    metrics:
+      - metrics.json:
+          cache: false

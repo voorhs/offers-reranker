@@ -1,0 +1,28 @@
+data:
+  train_path: ../data/splits/train.json
+  dev_path: ../data/splits/dev.json
+  test_path: ../data/splits/test.json
+  max_seq_length: 512
+
+model:
+  model_name: cointegrated/rubert-tiny2
+  num_labels: 1
+
+training:
+  batch_size: 16
+  learning_rate: 2e-5
+  num_epochs: 1
+  warmup_ratio: 0.1
+  gradient_accumulation_steps: 1
+  eval_strategy: steps
+  eval_steps: 500
+  save_strategy: steps
+  save_steps: 500
+  save_total_limit: 2
+  output_dir: ../models/rubert-tiny-reranker
+  seed: 42
+  fp16: false
+  bf16: false
+  load_best_model_at_end: true
+  metric_for_best_model: eval_evaluator
+  logging_steps: 100
