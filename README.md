@@ -53,6 +53,10 @@ export MLFLOW_S3_ENDPOINT_URL="http://minio-server:9000"
 | train | model_name, lr, batch_size, num_epochs, ... | train_loss, eval_ndcg@k (autolog) | config.yaml, model/, dvc.lock |
 | evaluate | model_path, test_path | test_ndcg@1/3/5, test_mrr | metrics.json |
 
+## Простейший инференс
+
+Смотрите [predict](./predict/).
+
 ## Целевые метрики
 
 - NDCG@3 > 0.6
