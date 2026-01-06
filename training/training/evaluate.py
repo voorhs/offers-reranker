@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import mlflow
@@ -11,6 +12,7 @@ from sentence_transformers import CrossEncoder
 from training.config import load_config
 from training.data import load_offers_data, prepare_evaluation_data
 from training.evaluation import CrossEncoderRankingEvaluator
+from dotenv import load_dotenv
 
 
 def main() -> None:
@@ -28,7 +30,12 @@ def main() -> None:
     # Load config
     config = load_config(args.config)
 
-    # Setup MLflow
+    # Setup MLflow tracking URI (defaults to local mlruns/)
+    load_dotenv()
+    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "mlruns")
+    mlflow.set_tracking_uri(tracking_uri)
+    logger.info(f"MLflow tracking URI: {tracking_uri}")
+
     mlflow.set_experiment(args.experiment_name)
 
     # Load model from output_dir

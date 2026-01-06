@@ -1,6 +1,7 @@
 """CLI entry point for training the offers reranker."""
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -9,6 +10,7 @@ from loguru import logger
 
 from training.config import load_config
 from training.trainer import OffersRerankerTrainer
+from dotenv import load_dotenv
 
 
 def main() -> None:
@@ -41,33 +43,30 @@ def main() -> None:
         logger.info(f"Loading configuration from {args.config}...")
         config = load_config(args.config)
 
-        # Setup MLflow
+        # Setup MLflow tracking URI (defaults to local mlruns/)
+        load_dotenv()
+        tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "mlruns")
+        mlflow.set_tracking_uri(tracking_uri)
+        logger.info(f"MLflow tracking URI: {tracking_uri}")
+
         mlflow.set_experiment(args.experiment_name)
 
         # Enable autologging for transformers (works with HF Trainer)
         mlflow.transformers.autolog(log_models=False)
 
         with mlflow.start_run(run_name=f"train-{config.model.model_name}"):
-            # Log parameters
+            # Log parameters (autolog handles training args like learning_rate, etc.)
             mlflow.log_params(
                 {
                     # Model params
                     "model_name": config.model.model_name,
                     "num_labels": config.model.num_labels,
-                    "max_length": config.model.max_length,
                     # Data params
                     "train_path": str(config.data.train_path),
                     "dev_path": str(config.data.dev_path),
                     "max_seq_length": config.data.max_seq_length,
-                    # Training params
-                    "batch_size": config.training.batch_size,
-                    "learning_rate": config.training.learning_rate,
-                    "num_epochs": config.training.num_epochs,
-                    "warmup_ratio": config.training.warmup_ratio,
-                    "weight_decay": config.training.weight_decay,
+                    # Training params (not covered by autolog)
                     "seed": config.training.seed,
-                    "fp16": config.training.fp16,
-                    "bf16": config.training.bf16,
                 }
             )
 

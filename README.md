@@ -22,14 +22,29 @@
 
 Проект использует MLflow для отслеживания экспериментов.
 
-### Просмотр результатов
+### Локальный режим (по умолчанию)
 
 ```bash
 cd training
 uv run mlflow ui
 ```
 
-Откройте http://localhost:5000 в браузере.
+### Удалённый сервер
+
+Для подключения к удалённому MLflow серверу задайте переменные окружения:
+
+```bash
+# Tracking server
+export MLFLOW_TRACKING_URI="http://mlflow-server:5001"
+
+# Для S3/MinIO хранилища артефактов (если используется)
+export AWS_ACCESS_KEY_ID="your-access-key"
+export AWS_SECRET_ACCESS_KEY="your-secret-key"
+export MLFLOW_S3_ENDPOINT_URL="http://minio-server:9000"
+```
+
+> **Note:** Для локальной отладки доступен референсный `docker-compose.mlflow.yaml`.
+> Production-сервер должен быть настроен администраторами.
 
 ### Что логируется
 
