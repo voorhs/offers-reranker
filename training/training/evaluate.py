@@ -97,7 +97,8 @@ def main() -> None:
 
         logger.info("Evaluation complete!")
         logger.info(f"Metrics: {metrics}")
-        logger.info(f"MLflow run ID: {mlflow.active_run().info.run_id}")
+        if run := mlflow.active_run():
+            logger.info(f"MLflow run ID: {run.info.run_id}")
 
 
 if __name__ == "__main__":

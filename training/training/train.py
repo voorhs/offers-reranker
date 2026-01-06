@@ -111,7 +111,8 @@ def main() -> None:
             logger.info("\n" + "=" * 80)
             logger.info("Training pipeline completed successfully!")
             logger.info(f"Model saved to: {config.training.output_dir}")
-            logger.info(f"MLflow run ID: {mlflow.active_run().info.run_id}")
+            if run := mlflow.active_run():
+                logger.info(f"MLflow run ID: {run.info.run_id}")
             logger.info("=" * 80)
 
     except FileNotFoundError as e:
