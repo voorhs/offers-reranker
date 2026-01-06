@@ -43,7 +43,7 @@ class OffersRerankerTrainer:
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(seed)
 
-    def prepare_data(self) -> tuple[Dataset, Dataset, CrossEncoderRankingEvaluator]:
+    def _prepare_data(self) -> tuple[Dataset, Dataset, CrossEncoderRankingEvaluator]:
         """Load and prepare training and evaluation datasets.
 
         Returns:
@@ -74,7 +74,7 @@ class OffersRerankerTrainer:
 
         return train_dataset, dev_dataset, evaluator
 
-    def setup_training(
+    def _setup_training(
         self, train_dataset: Dataset, dev_dataset: Dataset, evaluator: CrossEncoderRankingEvaluator
     ) -> None:
         """Setup model, loss, and trainer.
@@ -147,7 +147,7 @@ class OffersRerankerTrainer:
             evaluator=evaluator,
         )
 
-    def train(self) -> None:
+    def _train(self) -> None:
         """Run the training loop."""
         if self.trainer is None:
             raise RuntimeError("Trainer not initialized. Call setup_training() first.")
@@ -162,7 +162,7 @@ class OffersRerankerTrainer:
         logger.info("Training completed!")
         logger.info("=" * 80 + "\n")
 
-    def save_model(self, output_path: Path | str | None = None) -> None:
+    def _save_model(self, output_path: Path | str | None = None) -> None:
         """Save the trained model.
 
         Args:
@@ -179,62 +179,16 @@ class OffersRerankerTrainer:
         self.model.save(str(save_path))
         logger.info("Model saved successfully!")
 
-    def evaluate(self, test_data_path: Path | None = None) -> dict[str, float]:
-        """Evaluate the model on test data.
-
-        Args:
-            test_data_path: Path to test data (defaults to config test_path)
-
-        Returns:
-            Dictionary of evaluation metrics
-        """
-        if self.model is None:
-            raise RuntimeError("Model not initialized.")
-
-        test_path = test_data_path or self.config.data.test_path
-        if test_path is None:
-            raise ValueError("No test data path provided.")
-
-        logger.info(f"\nEvaluating on test data: {test_path}")
-
-        # Load test data
-        test_data_raw = load_offers_data(test_path)
-        eval_data = prepare_evaluation_data(test_data_raw)
-
-        # Create evaluator
-        evaluator = CrossEncoderRankingEvaluator(
-            eval_data=eval_data,
-            name="test",
-            ndcg_at_k=[1, 3, 5],
-            mrr_threshold=50.0,
-        )
-
-        # Run evaluation
-        evaluator(self.model)
-
-        return evaluator.last_metrics
-
     def run(self) -> None:
         """Run the complete training pipeline."""
         # Prepare data
-        train_dataset, dev_dataset, evaluator = self.prepare_data()
+        train_dataset, dev_dataset, evaluator = self._prepare_data()
 
         # Setup training
-        self.setup_training(train_dataset, dev_dataset, evaluator)
+        self._setup_training(train_dataset, dev_dataset, evaluator)
 
         # Train
-        self.train()
+        self._train()
 
         # Save final model
-        self.save_model()
-
-        # Evaluate on test set if available
-        if self.config.data.test_path is not None:
-            logger.info("\n" + "=" * 80)
-            logger.info("Final evaluation on test set")
-            logger.info("=" * 80)
-            test_metrics = self.evaluate()
-
-            logger.info("\nTest set results:")
-            for metric_name, value in test_metrics.items():
-                logger.info(f"  {metric_name}: {value:.4f}")
+        self._save_model()
