@@ -7,3 +7,6 @@
 
 # DVC metrics (tracked as metrics, not cached)
 /metrics.json
+
+# MLflow
+mlruns/
