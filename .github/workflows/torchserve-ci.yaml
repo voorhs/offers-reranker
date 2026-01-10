@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'inference/**'
-      - '.github/workflows/inference-ci.yaml'
+      - '.github/workflows/torchseve-ci.yaml'
       - '.github/workflows/reusable-ci.yaml'
 
 jobs:
@@ -12,7 +12,7 @@ jobs:
     name: Inference CI
     uses: ./.github/workflows/reusable-ci.yaml
     with:
-      working-directory: ./inference
+      working-directory: ./inference-torchserve
       python-version: '3.12'
       run-tests: true
       run-mypy: true

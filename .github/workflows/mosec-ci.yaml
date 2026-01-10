@@ -1,0 +1,20 @@
+name: Inference CI
+
+on:
+  pull_request:
+    paths:
+      - 'inference-mosec/**'
+      - '.github/workflows/mosec-ci.yaml'
+      - '.github/workflows/reusable-ci.yaml'
+
+jobs:
+  inference-ci:
+    name: Inference CI
+    uses: ./.github/workflows/reusable-ci.yaml
+    with:
+      working-directory: ./inference-mosec
+      python-version: '3.12'
+      run-tests: true
+      run-mypy: true
+      run-ruff: true
+
