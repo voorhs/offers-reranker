@@ -1,4 +1,4 @@
-name: Inference CI
+name: Mosec CI
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   inference-ci:
-    name: Inference CI
+    name: Code, Typing & Linting
     uses: ./.github/workflows/reusable-ci.yaml
     with:
       working-directory: ./inference-mosec
