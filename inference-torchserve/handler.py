@@ -33,7 +33,6 @@ class RerankerHandler(BaseHandler):  # type: ignore[misc]
         """
         logger.info("Initializing RerankerHandler")
 
-        # Get model directory from context
         properties = context.system_properties
         model_dir = properties.get("model_dir")
 
@@ -43,14 +42,11 @@ class RerankerHandler(BaseHandler):  # type: ignore[misc]
         model_path = Path(model_dir)
         logger.info(f"Loading model from: {model_path}")
 
-        # Validate model path
         self._validate_model_path(model_path)
 
-        # Determine device
         device = self._get_device(properties)
         logger.info(f"Using device: {device}")
 
-        # Load the CrossEncoder model
         try:
             self.model = CrossEncoder(
                 model_name=str(model_path),
@@ -123,13 +119,11 @@ class RerankerHandler(BaseHandler):  # type: ignore[misc]
 
         preprocessed = []
         for request in data:
-            # Extract body from request
             body = request.get("body")
             if body is None:
                 preprocessed.append({"error": "Request body is missing"})
                 continue
 
-            # Parse JSON if needed
             if isinstance(body, (bytes, bytearray)):
                 try:
                     body = json.loads(body.decode("utf-8"))
@@ -143,7 +137,6 @@ class RerankerHandler(BaseHandler):  # type: ignore[misc]
                     preprocessed.append({"error": f"Invalid JSON: {e}"})
                     continue
 
-            # Validate the request
             validation_error = self._validate_request(body)
             if validation_error:
                 preprocessed.append({"error": validation_error})
@@ -237,29 +230,23 @@ class RerankerHandler(BaseHandler):  # type: ignore[misc]
             offers = request["offers"]
             top_k = request.get("top_k")
 
-            # Create query-offer pairs for the model
             pairs = [[query, offer] for offer in offers]
 
             logger.debug(f"Predicting scores for {len(pairs)} query-offer pairs")
 
-            # Get predictions from model
             scores = self.model.predict(
                 pairs,
                 batch_size=self.config.batch_size,
                 show_progress_bar=False,
             )
 
-            # Create list of (offer, score, original_index) tuples
             offer_scores = [(offers[i], float(scores[i]), i) for i in range(len(offers))]
 
-            # Sort by score in descending order (highest relevance first)
             offer_scores.sort(key=lambda x: x[1], reverse=True)
 
-            # Apply top_k filtering if requested
             if top_k is not None:
                 offer_scores = offer_scores[:top_k]
 
-            # Create ranked offers with 1-indexed ranks
             ranked_offers = [
                 {
                     "text": offer,

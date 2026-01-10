@@ -188,32 +188,3 @@ uv run pytest tests/
    ```bash
    torchserve --stop
    ```
-
-## GPU Support
-
-For GPU inference, update the Dockerfile to use the GPU variant:
-
-```dockerfile
-FROM pytorch/torchserve:0.12.0-gpu
-```
-
-And update `docker-compose.yaml` to enable GPU access:
-
-```yaml
-services:
-  reranker:
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-```
-
-Then run:
-
-```bash
-docker compose up --build
-```
-
