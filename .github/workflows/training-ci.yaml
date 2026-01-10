@@ -9,7 +9,7 @@ on:
 
 jobs:
   training-ci:
-    name: Training CI
+    name: Code, Typing & Linting
     uses: ./.github/workflows/reusable-ci.yaml
     with:
       working-directory: ./training

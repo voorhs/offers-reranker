@@ -31,8 +31,12 @@ Each subproject has its own dedicated workflow that calls the reusable workflow:
   - Runs on changes to `training/**`
   - Executes linting, type checking, and tests
 
-- **`inference-ci.yaml`**: CI for the Inference subproject
-  - Runs on changes to `inference/**`
+- **`torchserve-ci.yaml`**: CI for the inference-torchserve subproject
+  - Runs on changes to `inference-torchserve/**`
+  - Executes linting, type checking, and tests
+
+- **`mosec-ci.yaml`**: CI for the inference-mosec subproject
+  - Runs on changes to `inference-mosec/**`
   - Executes linting, type checking, and tests
 
 ## Triggers

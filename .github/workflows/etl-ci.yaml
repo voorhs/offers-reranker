@@ -9,7 +9,7 @@ on:
 
 jobs:
   etl-ci:
-    name: ETL CI
+    name: Code, Typing & Linting
     uses: ./.github/workflows/reusable-ci.yaml
     with:
       working-directory: ./etl
