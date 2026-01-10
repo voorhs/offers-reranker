@@ -27,6 +27,7 @@ jobs:
     
     steps:
       - name: Free up disk space
+        working-directory: .
         run: |
           echo "Disk space before cleanup:"
           df -h
