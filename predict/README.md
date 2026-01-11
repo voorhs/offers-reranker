@@ -1,6 +1,13 @@
 # Predict Container
 
-Batch prediction container for the offers reranker model.
+Lightweight batch prediction container for the offers reranker model.
+
+## Architecture
+
+Uses a **multi-stage Docker build** for minimal image size:
+
+1. **Build stage**: Converts PyTorch model to ONNX format
+2. **Runtime stage**: Uses only `onnxruntime` + `tokenizers`
 
 ## Build
 
