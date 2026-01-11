@@ -1,0 +1,17 @@
+[project]
+name = "predict"
+version = "0.1.0"
+description = "Lightweight batch prediction for offers reranker"
+requires-python = "==3.12.*"
+
+[project.optional-dependencies]
+export = [
+    "torch>=2.0.0",
+    "optimum[onnxruntime]>=1.20.0",
+    "safetensors",
+]
+
+[tool.uv]
+index-url = "https://download.pytorch.org/whl/cpu"
+extra-index-url = ["https://pypi.org/simple"]
+
