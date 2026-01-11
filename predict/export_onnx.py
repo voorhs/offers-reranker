@@ -23,17 +23,14 @@ def export_to_onnx(model_path: str, output_dir: str) -> None:
 
     logger.info(f"Loading and exporting model from {model_path}...")
 
-    # Use optimum to export - handles dynamic axes correctly
     model = ORTModelForSequenceClassification.from_pretrained(
         model_path,
         export=True,
     )
 
-    # Save the ONNX model
     logger.info(f"Saving ONNX model to {output_path}...")
     model.save_pretrained(output_path)
 
-    # Also save tokenizer
     logger.info("Saving tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     tokenizer.save_pretrained(output_path)
