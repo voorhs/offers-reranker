@@ -1,0 +1,10 @@
+[project]
+name = "offers-reranker"
+version = "0.1.0"
+description = "Wrapper for running DVC pipeline that orchestrates ETL, training and evaluation"
+readme = "README.md"
+requires-python = "==3.12.*"
+dependencies = [
+    "dvc[s3]>=3.65.0,<3.66.0",
+    "pathspec==0.12.1",
+]

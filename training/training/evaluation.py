@@ -140,7 +140,7 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
         # Average metrics across all queries
         metrics = {}
         for k in self.ndcg_at_k:
-            metrics[f"{self.name}_ndcg@{k}"] = float(np.mean(ndcg_scores[k]))
+            metrics[f"{self.name}_ndcg_at_{k}"] = float(np.mean(ndcg_scores[k]))
 
         metrics[f"{self.name}_mrr"] = float(np.mean(mrr_scores))
 
@@ -157,4 +157,4 @@ class CrossEncoderRankingEvaluator(SentenceEvaluator):
         self.last_metrics = metrics
 
         # Return primary metric (NDCG@3)
-        return metrics[f"{self.name}_ndcg@3"]
+        return metrics[f"{self.name}_ndcg_at_3"]

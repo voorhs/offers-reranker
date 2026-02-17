@@ -1,0 +1,12 @@
+# DVC tracked
+/models
+
+# DVC pipeline outputs (managed by dvc.yaml)
+/data/parsed_samples.json
+/data/splits/
+
+# DVC metrics (tracked as metrics, not cached)
+/metrics.json
+
+# MLflow
+mlruns/

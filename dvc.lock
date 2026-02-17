@@ -1,0 +1,107 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: cd etl && uv run python -m main --skip-load --raw-output 
+      ../data/samples.jsonl --parsed-output ../data/parsed_samples.json 
+      --split-dir ../data/splits
+    deps:
+    - path: data/samples.jsonl
+      hash: md5
+      md5: 73c5fb140f14ff531fbf73a9725ad587
+      size: 50599
+    - path: etl/main.py
+      hash: md5
+      md5: b4bacf819f8c8724e13bc1f5d99663e3
+      size: 12468
+    outs:
+    - path: data/parsed_samples.json
+      hash: md5
+      md5: 68f9fe497fe0af347ec279ba8bed0e3c
+      size: 43049
+    - path: data/splits/dev.json
+      hash: md5
+      md5: d751713988987e9331980363e24189ce
+      size: 2
+    - path: data/splits/test.json
+      hash: md5
+      md5: 9f8a1c2770885a3b37cf0969f936d508
+      size: 21983
+    - path: data/splits/train.json
+      hash: md5
+      md5: 895bb3b489374b84956f8aaa193aa32a
+      size: 21068
+  train:
+    cmd: cd training && uv run python -m training.train configs/pipeline.yaml
+    deps:
+    - path: data/splits/dev.json
+      hash: md5
+      md5: d751713988987e9331980363e24189ce
+      size: 2
+    - path: data/splits/train.json
+      hash: md5
+      md5: 895bb3b489374b84956f8aaa193aa32a
+      size: 21068
+    - path: training/configs/pipeline.yaml
+      hash: md5
+      md5: a1a9fc1089700564cce0d3ecb0a4645c
+      size: 608
+    - path: training/training/config.py
+      hash: md5
+      md5: 15879c0ec5942ad787f0437dfd2569c2
+      size: 6123
+    - path: training/training/data.py
+      hash: md5
+      md5: 17d6c1aaaba5b42f8ff8f496daa96bff
+      size: 3649
+    - path: training/training/model.py
+      hash: md5
+      md5: 6f1079d44ca3317b1662ee33a602ae3c
+      size: 1233
+    - path: training/training/train.py
+      hash: md5
+      md5: d4d437de60ab6633dd2b7377fbca5ade
+      size: 4360
+    - path: training/training/trainer.py
+      hash: md5
+      md5: d0b594ee8564fab2e0020c7bbb8d6a71
+      size: 7260
+    outs:
+    - path: models/rubert-tiny-reranker
+      hash: md5
+      md5: 0e9f06b2c1bc6e2241547f630e49c673.dir
+      size: 828152412
+      nfiles: 31
+  evaluate:
+    cmd: cd training && uv run python -m training.evaluate --config 
+      configs/pipeline.yaml --output ../metrics.json
+    deps:
+    - path: data/splits/test.json
+      hash: md5
+      md5: 9f8a1c2770885a3b37cf0969f936d508
+      size: 21983
+    - path: models/rubert-tiny-reranker
+      hash: md5
+      md5: 0e9f06b2c1bc6e2241547f630e49c673.dir
+      size: 828152412
+      nfiles: 31
+    - path: training/configs/pipeline.yaml
+      hash: md5
+      md5: a1a9fc1089700564cce0d3ecb0a4645c
+      size: 608
+    - path: training/training/evaluate.py
+      hash: md5
+      md5: 882d12c1037859b1f93907072295af8e
+      size: 3122
+    - path: training/training/evaluation.py
+      hash: md5
+      md5: 1e26a7c8f46881c9822091c1cee9c110
+      size: 5020
+    - path: training/training/trainer.py
+      hash: md5
+      md5: d0b594ee8564fab2e0020c7bbb8d6a71
+      size: 7260
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: 8daaebe1576ca8123f3feea3fe74cfb7
+      size: 141

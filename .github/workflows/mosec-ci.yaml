@@ -1,18 +1,18 @@
-name: Inference CI
+name: Mosec CI
 
 on:
   pull_request:
     paths:
-      - 'inference/**'
-      - '.github/workflows/inference-ci.yaml'
+      - 'inference-mosec/**'
+      - '.github/workflows/mosec-ci.yaml'
       - '.github/workflows/reusable-ci.yaml'
 
 jobs:
   inference-ci:
-    name: Inference CI
+    name: Code, Typing & Linting
     uses: ./.github/workflows/reusable-ci.yaml
     with:
-      working-directory: ./inference
+      working-directory: ./inference-mosec
       python-version: '3.12'
       run-tests: true
       run-mypy: true
