@@ -1,0 +1,32 @@
+[project]
+name = "offers-reranker"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "cyclopts>=4.2.1,<4.3.0",
+    "httpx>=0.28.1,<0.28.2",
+    "logfire>=4.14.2,<4.15.0",
+    "loguru>=0.7.3,<0.7.4",
+    "python-dotenv>=1.2.1",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2,<1.19.0",
+    "ruff>=0.14.3,<0.14.4",
+]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_redundant_casts = true
+warn_unreachable = true
+
+mypy_path = "."
+explicit_package_bases = true

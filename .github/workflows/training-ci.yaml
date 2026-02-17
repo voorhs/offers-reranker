@@ -1,0 +1,20 @@
+name: Training CI
+
+on:
+  pull_request:
+    paths:
+      - 'training/**'
+      - '.github/workflows/training-ci.yaml'
+      - '.github/workflows/reusable-ci.yaml'
+
+jobs:
+  training-ci:
+    name: Training CI
+    uses: ./.github/workflows/reusable-ci.yaml
+    with:
+      working-directory: ./training
+      python-version: '3.12'
+      run-tests: true
+      run-mypy: true
+      run-ruff: true
+

@@ -1,0 +1,47 @@
+[project]
+name = "training"
+version = "0.1.0"
+description = "Training pipeline for offers reranker using CrossEncoder"
+authors = [
+    { name = "voorhs", email = "ilya_alekseev_2016@list.ru" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "accelerate>=1.11.0,<1.12.0",
+    "datasets>=4.3.0,<4.4.0",
+    "loguru>=0.7.3,<0.7.4",
+    "numpy>=2.3.4,<2.4.0",
+    "pydantic>=2.12.3,<2.13.0",
+    "pyyaml>=6.0.3,<6.1.0",
+    "scikit-learn>=1.7.2,<1.8.0",
+    "sentence-transformers>=5.1.2,<5.2.0",
+    "torch>=2.9.0,<2.10.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2,<1.19.0",
+    "pytest>=8.4.2,<8.5.0",
+    "ruff>=0.14.3,<0.14.4",
+    "types-pyyaml>=6.0.12.20250915,<6.1.0.0",
+]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_redundant_casts = true
+warn_unreachable = true
+
+plugins = ["pydantic.mypy"]
+exclude = ["tests"]
+
+mypy_path = "."
+explicit_package_bases = true
+
+[tool.pydantic.mypy]
+init_forbid_extra = true
+init_typed = true
